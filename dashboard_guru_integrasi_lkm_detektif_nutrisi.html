@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Guru - Detektif Nutrisi</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                            800: '#166534',
+                            900: '#14532d',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col antialiased">
+
+    <!-- Header / Navbar -->
+    <header class="bg-gradient-to-r from-emerald-800 to-teal-900 text-white shadow-lg sticky top-0 z-30">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="bg-white/10 p-2 rounded-lg backdrop-blur-sm border border-white/20">
+                    <i class="fa-solid font-bold fa-magnifying-glass-chart text-emerald-400 text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-lg font-bold tracking-wide leading-none">Dashboard Guru</h1>
+                    <span class="text-xs text-emerald-200 font-medium">Detektif Nutrisi - LKM Digital Real-Time</span>
+                </div>
+            </div>
+
+            <!-- Header Quick Actions -->
+            <div class="flex items-center space-x-3">
+                <button id="btnOpenSetup" class="px-3 py-1.5 text-xs sm:text-sm font-semibold bg-emerald-700/80 hover:bg-emerald-600 rounded-lg border border-emerald-500/30 transition flex items-center space-x-2">
+                    <i class="fa-solid fa-code text-emerald-300"></i>
+                    <span class="hidden sm:inline">Skrip Integrasi LKM</span>
+                </button>
+                <button id="btnExportCSV" class="px-3 py-1.5 text-xs sm:text-sm font-semibold bg-white text-emerald-900 hover:bg-emerald-50 rounded-lg shadow-sm transition flex items-center space-x-2">
+                    <i class="fa-solid fa-file-excel text-emerald-600"></i>
+                    <span>Ekspor CSV</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col gap-6">
+
+        <!-- Top Overview Statistics -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80 flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Total Murid/Sesi</p>
+                    <h3 id="statTotalStudents" class="text-2xl font-bold text-slate-800 mt-1">0</h3>
+                </div>
+                <div class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center text-xl">
+                    <i class="fa-solid fa-users"></i>
+                </div>
+            </div>
+
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80 flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Total Kelompok</p>
+                    <h3 id="statTotalGroups" class="text-2xl font-bold text-slate-800 mt-1">0</h3>
+                </div>
+                <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center text-xl">
+                    <i class="fa-solid fa-people-group"></i>
+                </div>
+            </div>
+
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80 flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Rata-rata Progres</p>
+                    <h3 id="statAvgProgress" class="text-2xl font-bold text-emerald-600 mt-1">0%</h3>
+                </div>
+                <div class="w-12 h-12 bg-amber-50 text-amber-600 rounded-xl flex items-center justify-center text-xl">
+                    <i class="fa-solid fa-chart-line"></i>
+                </div>
+            </div>
+
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80 flex items-center justify-between">
+                <div>
+                    <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Selesai (Penutup)</p>
+                    <h3 id="statCompleted" class="text-2xl font-bold text-slate-800 mt-1">0</h3>
+                </div>
+                <div class="w-12 h-12 bg-purple-50 text-purple-600 rounded-xl flex items-center justify-center text-xl">
+                    <i class="fa-solid fa-circle-check"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Toolbar & Filter Controls -->
+        <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200/80 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
+            <div class="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
+                <!-- Search Input -->
+                <div class="relative w-full sm:w-64">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+                    <input type="text" id="searchInput" placeholder="Cari nama murid/kelompok..." class="w-full pl-9 pr-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition">
+                </div>
+
+                <!-- Group Filter -->
+                <select id="filterGroup" class="w-full sm:w-48 py-2 px-3 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition">
+                    <option value="ALL">Semua Kelompok</option>
+                </select>
+            </div>
+
+            <!-- Sync & Data Source Info -->
+            <div class="flex items-center justify-between md:justify-end space-x-4 border-t md:border-t-0 pt-3 md:pt-0 border-slate-100">
+                <div class="flex items-center space-x-2">
+                    <span class="relative flex h-3 w-3">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+                    </span>
+                    <span class="text-xs font-semibold text-slate-500" id="liveSyncStatus">Realtime Active</span>
+                </div>
+                <button id="btnRefresh" title="Refresh manual" class="p-2 text-slate-400 hover:text-emerald-600 hover:bg-slate-100 rounded-lg transition">
+                    <i class="fa-solid fa-rotate-right"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Student Progress Grid / List Table -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
+            <!-- Left Sidebar: Student & Group List -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 flex flex-col max-h-[700px]">
+                <div class="p-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50 rounded-t-2xl">
+                    <h2 class="font-bold text-slate-700 text-sm flex items-center gap-2">
+                        <i class="fa-solid fa-list-check text-emerald-600"></i>
+                        Daftar Murid & Kelompok
+                    </h2>
+                    <span id="recordCounter" class="text-xs bg-slate-200 text-slate-600 font-bold px-2 py-0.5 rounded-full">0</span>
+                </div>
+
+                <!-- Scrollable Cards List -->
+                <div id="studentListContainer" class="p-3 overflow-y-auto space-y-2 flex-grow">
+                    <!-- Dynamic Items Populated Here -->
+                    <div class="text-center py-12 text-slate-400 text-sm">
+                        <i class="fa-solid fa-spinner animate-spin text-2xl mb-2 text-emerald-500"></i>
+                        <p>Memuat data pengerjaan murid...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Area: Detailed Mission View -->
+            <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-slate-200/80 flex flex-col min-h-[500px] max-h-[700px] overflow-hidden">
+                <div id="detailHeader" class="p-4 border-b border-slate-100 bg-slate-50/50 flex items-center justify-between">
+                    <div>
+                        <h2 id="detailStudentName" class="font-bold text-slate-800 text-base">Pilih Murid / Kelompok</h2>
+                        <p id="detailStudentMeta" class="text-xs text-slate-400">Klik salah satu murid dari daftar di samping untuk melihat rincian pengerjaan LKM</p>
+                    </div>
+                    <span id="detailBadgeStatus" class="hidden px-2.5 py-1 text-xs font-bold rounded-full bg-slate-100 text-slate-500">
+                        Progres 0%
+                    </span>
+                </div>
+
+                <!-- Mission Details Tab / Scrollable Content -->
+                <div id="detailContent" class="p-6 overflow-y-auto flex-grow text-slate-600">
+                    <!-- Placeholder State -->
+                    <div class="flex flex-col items-center justify-center h-full text-center py-16 text-slate-400">
+                        <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center text-slate-300 text-2xl mb-3">
+                            <i class="fa-solid fa-clipboard-user"></i>
+                        </div>
+                        <p class="font-semibold text-slate-500">Belum Ada Murid Dipilih</p>
+                        <p class="text-xs max-w-sm mt-1">Pilih data siswa di sebelah kiri untuk memeriksa hasil pekerjaan LKM secara detail.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Modal: Skrip Integrasi LKM Guru -->
+    <div id="setupModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-2xl shadow-xl max-w-3xl w-full overflow-hidden flex flex-col max-h-[90vh]">
+            <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50">
+                <div class="flex items-center space-x-2 text-slate-800 font-bold">
+                    <i class="fa-solid fa-code text-emerald-600"></i>
+                    <span>Skrip Auto-Sync LKM Digital Murid</span>
+                </div>
+                <button id="btnCloseSetup" class="text-slate-400 hover:text-slate-600 p-1">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+            
+            <div class="p-6 overflow-y-auto space-y-4 text-xs text-slate-600">
+                <p class="text-sm">
+                    Tempelkan skrip JavaScript di bawah ini pada bagian 
+                    <code class="bg-slate-100 text-emerald-700 px-1 py-0.5 rounded font-mono">&lt;body&gt;</code> paling bawah di file 
+                    <strong class="text-slate-800">lkm_digital_detektif_nutrisi.html</strong> milik murid. Skrip ini secara otomatis mendeteksi input, form, kalkulasi, serta refleksi murid dan mengirimkannya secara real-time ke Dashboard.
+                </p>
+
+                <div class="bg-amber-50 border border-amber-200 rounded-xl p-3 text-amber-800 flex items-start space-x-2">
+                    <i class="fa-solid fa-lightbulb text-amber-500 text-sm mt-0.5"></i>
+                    <div>
+                        <strong>Petunjuk Tambahan:</strong> Skrip telah dikonfigurasi menggunakan backend Firestore bawaan. Semua data tersinkron secara terisolasi dan aman di bawah App ID <code class="bg-amber-100 px-1 rounded font-mono">detektif-nutrisi-app</code>.
+                    </div>
+                </div>
+
+                <div class="relative">
+                    <pre id="codeBlock" class="bg-slate-900 text-slate-100 p-4 rounded-xl font-mono text-xs overflow-x-auto max-h-64 leading-relaxed"></pre>
+                    <button id="btnCopyCode" class="absolute top-3 right-3 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold px-3 py-1.5 rounded-lg text-xs transition flex items-center space-x-1 shadow-md">
+                        <i class="fa-regular fa-copy"></i>
+                        <span>Salin Kode</span>
+                    </button>
+                </div>
+            </div>
+            <div class="px-6 py-3 border-t border-slate-100 bg-slate-50 text-right">
+                <button id="btnCloseSetup2" class="px-4 py-2 text-xs font-semibold bg-slate-200 hover:bg-slate-300 text-slate-700 rounded-xl transition">
+                    Tutup
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase App Modules -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, onSnapshot, doc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Global Configuration & App ID
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'detektif-nutrisi-app';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
+            apiKey: "AIzaSyDummyKeyForFallbackOnly",
+            authDomain: "detektif-nutrisi.firebaseapp.com",
+            projectId: "detektif-nutrisi",
+            storageBucket: "detektif-nutrisi.appspot.com",
+            messagingSenderId: "123456789",
+            appId: "1:123456789:web:abcdef"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // State Management
+        let studentsData = {};
+        let selectedStudentId = null;
+        let activeFilterGroup = 'ALL';
+        let searchQuery = '';
+
+        // Authentication Pre-flight
+        async function initAuth() {
+            try {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+            } catch (err) {
+                console.warn("Auth initialization fallback:", err);
+            }
+        }
+
+        // Realtime Firestore Listener
+        function subscribeRealtimeData() {
+            // Path strict: /artifacts/{appId}/public/data/lkm_responses
+            const responsesRef = collection(db, 'artifacts', appId, 'public', 'data', 'lkm_responses');
+
+            onSnapshot(responsesRef, (snapshot) => {
+                studentsData = {};
+                snapshot.forEach((docSnap) => {
+                    const data = docSnap.data();
+                    const id = docSnap.id;
+                    studentsData[id] = { id, ...data };
+                });
+                renderUI();
+            }, (error) => {
+                console.error("Firestore Listen Error:", error);
+                document.getElementById('liveSyncStatus').innerText = "Koneksi Terputus";
+                document.getElementById('liveSyncStatus').className = "text-xs font-semibold text-red-500";
+            });
+        }
+
+        // Render Dashboard UI Component
+        function renderUI() {
+            const studentIds = Object.keys(studentsData);
+            let filteredList = studentIds.map(id => studentsData[id]);
+
+            // Filtering logic
+            if (activeFilterGroup !== 'ALL') {
+                filteredList = filteredList.filter(item => (item.kelompok || '').toString() === activeFilterGroup);
+            }
+
+            if (searchQuery.trim() !== '') {
+                const q = searchQuery.toLowerCase();
+                filteredList = filteredList.filter(item => 
+                    (item.nama || '').toLowerCase().includes(q) ||
+                    (item.kelompok || '').toLowerCase().includes(q) ||
+                    (item.kelas || '').toLowerCase().includes(q)
+                );
+            }
+
+            // Summary Stats Calculation
+            const totalStudents = studentIds.length;
+            const groupsSet = new Set(studentIds.map(id => studentsData[id].kelompok).filter(Boolean));
+            const avgProgress = totalStudents > 0 
+                ? Math.round(studentIds.reduce((acc, id) => acc + (studentsData[id].progress || 0), 0) / totalStudents)
+                : 0;
+            const completedCount = studentIds.filter(id => (studentsData[id].progress || 0) >= 100).length;
+
+            document.getElementById('statTotalStudents').innerText = totalStudents;
+            document.getElementById('statTotalGroups').innerText = groupsSet.size;
+            document.getElementById('statAvgProgress').innerText = `${avgProgress}%`;
+            document.getElementById('statCompleted').innerText = completedCount;
+
+            // Populate Group Filter Dropdown options dynamically
+            const groupSelect = document.getElementById('filterGroup');
+            const currentGroupVal = groupSelect.value;
+            groupSelect.innerHTML = `<option value="ALL">Semua Kelompok</option>`;
+            Array.from(groupsSet).sort().forEach(grp => {
+                const opt = document.createElement('option');
+                opt.value = grp;
+                opt.innerText = `Kelompok ${grp}`;
+                if (grp === currentGroupVal) opt.selected = true;
+                groupSelect.appendChild(opt);
+            });
+
+            // Update Counter Text
+            document.getElementById('recordCounter').innerText = `${filteredList.length} Murid`;
+
+            // Render Student List Side Panel
+            const container = document.getElementById('studentListContainer');
+            if (filteredList.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-10 text-slate-400 text-xs">
+                        <i class="fa-regular fa-folder-open text-3xl mb-2 text-slate-300"></i>
+                        <p>Belum ada data pengerjaan LKM murid.</p>
+                    </div>`;
+                return;
+            }
+
+            container.innerHTML = '';
+            filteredList.sort((a, b) => (b.updatedAt || 0) - (a.updatedAt || 0)).forEach(student => {
+                const isSelected = student.id === selectedStudentId;
+                const progress = student.progress || 0;
+                const lastActive = student.updatedAt ? new Date(student.updatedAt).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) : '-';
+
+                const card = document.createElement('div');
+                card.className = `p-3 rounded-xl border transition cursor-pointer flex flex-col gap-2 ${
+                    isSelected 
+                    ? 'bg-emerald-50/80 border-emerald-400 shadow-sm' 
+                    : 'bg-white border-slate-200/80 hover:border-emerald-300 hover:bg-slate-50'
+                }`;
+
+                card.onclick = () => selectStudent(student.id);
+
+                card.innerHTML = `
+                    <div class="flex items-start justify-between">
+                        <div>
+                            <h4 class="font-bold text-slate-800 text-xs sm:text-sm leading-snug">${escapeHtml(student.nama || 'Tanpa Nama')}</h4>
+                            <div class="flex items-center gap-2 mt-0.5 text-[11px] text-slate-500">
+                                <span class="bg-slate-100 font-medium px-1.5 py-0.5 rounded text-slate-600">Kel. ${escapeHtml(student.kelompok || '-')}</span>
+                                <span>${escapeHtml(student.kelas || 'Kelas -')}</span>
+                            </div>
+                        </div>
+                        <span class="text-[10px] text-slate-400 flex items-center gap-1">
+                            <i class="fa-regular fa-clock"></i> ${lastActive}
+                        </span>
+                    </div>
+
+                    <!-- Progress Bar -->
+                    <div class="w-full bg-slate-100 rounded-full h-2 overflow-hidden mt-1">
+                        <div class="bg-emerald-500 h-full rounded-full transition-all duration-300" style="width: ${progress}%"></div>
+                    </div>
+                    <div class="flex justify-between items-center text-[10px] text-slate-400">
+                        <span>Progres Pengerjaan</span>
+                        <span class="font-semibold text-emerald-700">${progress}%</span>
+                    </div>
+                `;
+
+                container.appendChild(card);
+            });
+
+            // Re-render Detail if student selected
+            if (selectedStudentId && studentsData[selectedStudentId]) {
+                renderStudentDetail(studentsData[selectedStudentId]);
+            }
+        }
+
+        // Select Student Function
+        function selectStudent(id) {
+            selectedStudentId = id;
+            renderUI();
+        }
+
+        // Render Detailed Student Submissions (Misi 1 s.d. Penutup)
+        function renderStudentDetail(student) {
+            const headerName = document.getElementById('detailStudentName');
+            const headerMeta = document.getElementById('detailStudentMeta');
+            const badge = document.getElementById('detailBadgeStatus');
+            const detailContainer = document.getElementById('detailContent');
+
+            headerName.innerText = `${student.nama || 'Tanpa Nama'}`;
+            headerMeta.innerText = `Kelompok: ${student.kelompok || '-'} | Kelas: ${student.kelas || '-'} | Terakhir Diperbarui: ${student.updatedAt ? new Date(student.updatedAt).toLocaleString('id-ID') : '-'}`;
+            
+            badge.innerText = `Progres ${student.progress || 0}%`;
+            badge.className = `px-3 py-1 text-xs font-bold rounded-full border ${
+                (student.progress || 0) >= 100 
+                ? 'bg-emerald-100 text-emerald-800 border-emerald-300' 
+                : 'bg-amber-50 text-amber-700 border-amber-200'
+            }`;
+            badge.classList.remove('hidden');
+
+            const data = student.answers || {};
+
+            detailContainer.innerHTML = `
+                <div class="space-y-6 text-xs sm:text-sm">
+
+                    <!-- Section Identitas -->
+                    <div class="bg-slate-50 border border-slate-200/80 p-4 rounded-xl">
+                        <h3 class="font-bold text-slate-800 text-sm mb-3 flex items-center gap-2">
+                            <i class="fa-solid fa-id-card text-emerald-600"></i>
+                            Identitas Siswa & Anggota Kelompok
+                        </h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div><strong class="text-slate-500">Nama Lengkap:</strong> ${escapeHtml(student.nama || '-')}</div>
+                            <div><strong class="text-slate-500">Kelompok:</strong> ${escapeHtml(student.kelompok || '-')}</div>
+                            <div><strong class="text-slate-500">Kelas:</strong> ${escapeHtml(student.kelas || '-')}</div>
+                            <div><strong class="text-slate-500">Anggota Kelompok:</strong> ${escapeHtml(student.anggota || '-')}</div>
+                        </div>
+                    </div>
+
+                    <!-- Misi 1: Identifikasi Permasalahan Gizi -->
+                    <div class="border border-slate-200 rounded-xl overflow-hidden">
+                        <div class="bg-emerald-50 px-4 py-2.5 font-bold text-emerald-900 border-b border-slate-200 flex items-center justify-between">
+                            <span>Misi 1: Analisis Kasus & Masalah Nutrisi</span>
+                            <i class="fa-solid fa-magnifying-glass text-emerald-600"></i>
+                        </div>
+                        <div class="p-4 space-y-3 bg-white">
+                            <div>
+                                <label class="font-semibold text-slate-700">Analisis Permasalahan Menu Sekolah:</label>
+                                <p class="mt-1 bg-slate-50 p-2.5 rounded-lg border border-slate-200/60 whitespace-pre-wrap">${escapeHtml(data.misi1_permasalahan || 'Belum diisi')}</p>
+                            </div>
+                            <div>
+                                <label class="font-semibold text-slate-700">Identifikasi Dampak Kesehatan:</label>
+                                <p class="mt-1 bg-slate-50 p-2.5 rounded-lg border border-slate-200/60 whitespace-pre-wrap">${escapeHtml(data.misi1_dampak || 'Belum diisi')}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Misi 2: Tabel Analisis Kandungan Nutrisi & Kalori -->
+                    <div class="border border-slate-200 rounded-xl overflow-hidden">
+                        <div class="bg-blue-50 px-4 py-2.5 font-bold text-blue-900 border-b border-slate-200 flex items-center justify-between">
+                            <span>Misi 2: Perhitungan Kalori & Analisis Nutrisi MBG</span>
+                            <i class="fa-solid fa-calculator text-blue-600"></i>
+                        </div>
+                        <div class="p-4 bg-white space-y-3">
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left text-xs border-collapse">
+                                    <thead>
+                                        <tr class="bg-slate-100 text-slate-700 border-b border-slate-200">
+                                            <th class="p-2">Bahan Makanan</th>
+                                            <th class="p-2">Porsi (g)</th>
+                                            <th class="p-2">Karbo (g)</th>
+                                            <th class="p-2">Protein (g)</th>
+                                            <th class="p-2">Lemak (g)</th>
+                                            <th class="p-2">Total Kalori</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-slate-100">
+                                        ${renderNutrientRows(data.misi2_tabel_nutrisi)}
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-2">
+                                <div class="bg-blue-50/50 p-3 rounded-lg border border-blue-100">
+                                    <span class="text-xs text-slate-500 font-medium">Total Energi Terhitung:</span>
+                                    <p class="font-bold text-blue-700 text-base">${escapeHtml(data.misi2_total_kalori || '0')} kcal</p>
+                                </div>
+                                <div class="bg-blue-50/50 p-3 rounded-lg border border-blue-100">
+                                    <span class="text-xs text-slate-500 font-medium">Kesesuaian Standar Gizi:</span>
+                                    <p class="font-semibold text-slate-700">${escapeHtml(data.misi2_kesimpulan || 'Belum ada evaluasi')}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Misi 3: Perancangan Menu MBG Komplit -->
+                    <div class="border border-slate-200 rounded-xl overflow-hidden">
+                        <div class="bg-purple-50 px-4 py-2.5 font-bold text-purple-900 border-b border-slate-200 flex items-center justify-between">
+                            <span>Misi 3: Rancangan Solusi Menu MBG Seimbang</span>
+                            <i class="fa-solid fa-utensils text-purple-600"></i>
+                        </div>
+                        <div class="p-4 bg-white space-y-3">
+                            <div>
+                                <strong class="text-slate-700">Komponen Bahan Dipilih:</strong>
+                                <p class="mt-1 bg-slate-50 p-2.5 rounded-lg border border-slate-200/60">${escapeHtml(data.misi3_menu_pilihan || 'Belum memilih menu')}</p>
+                            </div>
+                            <div>
+                                <strong class="text-slate-700">Alasan & Pembenaran Komposisi Gizi:</strong>
+                                <p class="mt-1 bg-slate-50 p-2.5 rounded-lg border border-slate-200/60 whitespace-pre-wrap">${escapeHtml(data.misi3_alasan || 'Belum diisi')}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Misi 4: Karya Kreatif & Media Media Upload -->
+                    <div class="border border-slate-200 rounded-xl overflow-hidden">
+                        <div class="bg-amber-50 px-4 py-2.5 font-bold text-amber-900 border-b border-slate-200 flex items-center justify-between">
+                            <span>Misi 4: Hasil Karya / Kampanye Kreatif</span>
+                            <i class="fa-solid fa-photo-film text-amber-600"></i>
+                        </div>
+                        <div class="p-4 bg-white space-y-3">
+                            <div>
+                                <strong class="text-slate-700">Link Poster / Video Kampanye / Slide:</strong>
+                                ${data.misi4_media_link 
+                                    ? `<a href="${escapeHtml(data.misi4_media_link)}" target="_blank" class="block mt-1 text-emerald-600 hover:underline font-medium break-all"><i class="fa-solid fa-arrow-up-right-from-square text-xs mr-1"></i>${escapeHtml(data.misi4_media_link)}</a>`
+                                    : `<p class="mt-1 text-slate-400 italic">Tautan karya belum dilampirkan</p>`
+                                }
+                            </div>
+                            <div>
+                                <strong class="text-slate-700">Deskripsi Singkat Karya:</strong>
+                                <p class="mt-1 bg-slate-50 p-2.5 rounded-lg border border-slate-200/60 whitespace-pre-wrap">${escapeHtml(data.misi4_deskripsi || 'Belum diisi')}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Penutup & Refleksi Belajar -->
+                    <div class="border border-slate-200 rounded-xl overflow-hidden">
+                        <div class="bg-slate-100 px-4 py-2.5 font-bold text-slate-800 border-b border-slate-200 flex items-center justify-between">
+                            <span>Penutup: Refleksi & Evaluasi Diri</span>
+                            <i class="fa-solid fa-brain text-slate-600"></i>
+                        </div>
+                        <div class="p-4 bg-white space-y-3">
+                            <div>
+                                <strong class="text-slate-700">Pengalaman & Pemahaman Baru:</strong>
+                                <p class="mt-1 bg-slate-50 p-2.5 rounded-lg border border-slate-200/60 whitespace-pre-wrap">${escapeHtml(data.penutup_refleksi || 'Belum diisi')}</p>
+                            </div>
+                            <div>
+                                <strong class="text-slate-700">Kendala yang Dihadapi & Solusi Kelompok:</strong>
+                                <p class="mt-1 bg-slate-50 p-2.5 rounded-lg border border-slate-200/60 whitespace-pre-wrap">${escapeHtml(data.penutup_kendala || 'Belum diisi')}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            `;
+        }
+
+        // Helper: Render Nutrient Dynamic Table Rows
+        function renderNutrientRows(items) {
+            if (!items || !Array.isArray(items) || items.length === 0) {
+                return `<tr><td colspan="6" class="p-3 text-center text-slate-400 italic">Tabel analisis nutrisi belum diisi</td></tr>`;
+            }
+            return items.map(row => `
+                <tr class="hover:bg-slate-50">
+                    <td class="p-2 font-medium text-slate-800">${escapeHtml(row.nama || '-')}</td>
+                    <td class="p-2">${escapeHtml(row.porsi || '0')} g</td>
+                    <td class="p-2">${escapeHtml(row.karbo || '0')} g</td>
+                    <td class="p-2">${escapeHtml(row.protein || '0')} g</td>
+                    <td class="p-2">${escapeHtml(row.lemak || '0')} g</td>
+                    <td class="p-2 font-semibold text-blue-600">${escapeHtml(row.kalori || '0')} kcal</td>
+                </tr>
+            `).join('');
+        }
+
+        // Helper Sanitize HTML
+        function escapeHtml(str) {
+            if (typeof str !== 'string') return str;
+            return str.replace(/[&<>"']/g, function(m) {
+                return {
+                    '&': '&amp;',
+                    '<': '&lt;',
+                    '>': '&gt;',
+                    '"': '&quot;',
+                    "'": '&#039;'
+                }[m];
+            });
+        }
+
+        // Export CSV Functionality
+        function exportToCSV() {
+            const studentIds = Object.keys(studentsData);
+            if (studentIds.length === 0) {
+                alert("Tidak ada data murid untuk diekspor!");
+                return;
+            }
+
+            let csvContent = "data:text/csv;charset=utf-8,";
+            csvContent += "ID,Nama,Kelompok,Kelas,Anggota,Progres (%),Misi 1 Masalah,Misi 1 Dampak,Total Kalori (kcal),Misi 3 Menu,Misi 4 Media,Refleksi,Waktu Update\n";
+
+            studentIds.forEach(id => {
+                const s = studentsData[id];
+                const ans = s.answers || {};
+                const row = [
+                    `"${id}"`,
+                    `"${(s.nama || '').replace(/"/g, '""')}"`,
+                    `"${(s.kelompok || '').replace(/"/g, '""')}"`,
+                    `"${(s.kelas || '').replace(/"/g, '""')}"`,
+                    `"${(s.anggota || '').replace(/"/g, '""')}"`,
+                    `"${s.progress || 0}"`,
+                    `"${(ans.misi1_permasalahan || '').replace(/"/g, '""')}"`,
+                    `"${(ans.misi1_dampak || '').replace(/"/g, '""')}"`,
+                    `"${(ans.misi2_total_kalori || '').replace(/"/g, '""')}"`,
+                    `"${(ans.misi3_menu_pilihan || '').replace(/"/g, '""')}"`,
+                    `"${(ans.misi4_media_link || '').replace(/"/g, '""')}"`,
+                    `"${(ans.penutup_refleksi || '').replace(/"/g, '""')}"`,
+                    `"${s.updatedAt ? new Date(s.updatedAt).toLocaleString('id-ID') : ''}"`
+                ].join(",");
+                csvContent += row + "\n";
+            });
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `Data_LKM_Detektif_Nutrisi_${new Date().toISOString().slice(0,10)}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // Code Snippet Generator for Insertion into Student LKM HTML
+        function generateIntegrationScript() {
+            const code = `
+<!-- ======================================================== -->
+<!-- SKRIP SINKRONISASI REAL-TIME DETEKTIF NUTRISI UNTUK LKM  -->
+<!-- Tempelkan kode ini tepat di atas tag </body> pada LKM   -->
+<!-- ======================================================== -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+  import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+  import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+  const firebaseConfig = ${JSON.stringify(firebaseConfig, null, 2)};
+  const appId = "${appId}";
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  // Generate or retrieve persistent local Student UUID
+  let studentId = localStorage.getItem('dn_student_uuid');
+  if (!studentId) {
+    studentId = 'std_' + Math.random().toString(36).substring(2, 9);
+    localStorage.setItem('dn_student_uuid', studentId);
+  }
+
+  // Function to gather all input data from LKM
+  function collectLKMData() {
+    const getVal = (id) => {
+      const el = document.getElementById(id);
+      return el ? (el.value || el.innerText || '').trim() : '';
+    };
+
+    // Calculate completion progress percentage
+    const trackFields = ['nama_siswa', 'kelompok', 'misi1_permasalahan', 'misi2_kalori', 'misi3_menu', 'penutup_refleksi'];
+    let filledCount = 0;
+    trackFields.forEach(fId => { if (getVal(fId)) filledCount++; });
+    const progress = Math.min(100, Math.round((filledCount / trackFields.length) * 100));
+
+    return {
+      nama: getVal('nama_siswa') || getVal('nama') || 'Murid Tanpa Nama',
+      kelompok: getVal('kelompok') || '1',
+      kelas: getVal('kelas') || '-',
+      anggota: getVal('anggota') || '',
+      progress: progress,
+      updatedAt: Date.now(),
+      answers: {
+        misi1_permasalahan: getVal('misi1_permasalahan') || getVal('jawab_misi1_1'),
+        misi1_dampak: getVal('misi1_dampak') || getVal('jawab_misi1_2'),
+        misi2_total_kalori: getVal('misi2_kalori') || getVal('total_kalori_misi2'),
+        misi2_kesimpulan: getVal('misi2_kesimpulan') || getVal('evaluasi_misi2'),
+        misi3_menu_pilihan: getVal('misi3_menu') || getVal('pilihan_mbg'),
+        misi3_alasan: getVal('misi3_alasan') || getVal('alasan_mbg'),
+        misi4_media_link: getVal('misi4_link') || getVal('link_karya'),
+        misi4_deskripsi: getVal('misi4_deskripsi') || getVal('deskripsi_karya'),
+        penutup_refleksi: getVal('penutup_refleksi') || getVal('refleksi_siswa'),
+        penutup_kendala: getVal('penutup_kendala') || getVal('kendala_siswa')
+      }
+    };
+  }
+
+  // Auto-sync function to send data to Firestore
+  async function syncToDashboard() {
+    try {
+      if (!auth.currentUser) {
+        await signInAnonymously(auth);
+      }
+      const dataPayload = collectLKMData();
+      
+      // Strict Path: /artifacts/{appId}/public/data/lkm_responses/{studentId}
+      const targetDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'lkm_responses', studentId);
+      await setDoc(targetDocRef, dataPayload, { merge: true });
+      console.log('Detektif Nutrisi: Data berhasil tersinkron ke Dashboard Guru!');
+    } catch (err) {
+      console.error('Error Sync Detektif Nutrisi:', err);
+    }
+  }
+
+  // Attach event listeners to all inputs and textareas for instant real-time sync
+  window.addEventListener('DOMContentLoaded', () => {
+    syncToDashboard(); // Initial sync on load
+
+    document.querySelectorAll('input, textarea, select').forEach(element => {
+      element.addEventListener('change', syncToDashboard);
+      element.addEventListener('blur', syncToDashboard);
+    });
+  });
+<\/script>`.trim();
+
+            document.getElementById('codeBlock').innerText = code;
+        }
+
+        // Initialize App & UI Event Listeners
+        window.onload = async () => {
+            await initAuth();
+            subscribeRealtimeData();
+            generateIntegrationScript();
+
+            // Search filter listener
+            document.getElementById('searchInput').addEventListener('input', (e) => {
+                searchQuery = e.target.value;
+                renderUI();
+            });
+
+            // Group filter listener
+            document.getElementById('filterGroup').addEventListener('change', (e) => {
+                activeFilterGroup = e.target.value;
+                renderUI();
+            });
+
+            // Refresh button
+            document.getElementById('btnRefresh').addEventListener('click', () => {
+                renderUI();
+            });
+
+            // Export CSV
+            document.getElementById('btnExportCSV').addEventListener('click', exportToCSV);
+
+            // Modal Controls
+            const modal = document.getElementById('setupModal');
+            document.getElementById('btnOpenSetup').onclick = () => modal.classList.remove('hidden');
+            document.getElementById('btnCloseSetup').onclick = () => modal.classList.add('hidden');
+            document.getElementById('btnCloseSetup2').onclick = () => modal.classList.add('hidden');
+
+            // Copy Code Button
+            document.getElementById('btnCopyCode').onclick = () => {
+                const codeText = document.getElementById('codeBlock').innerText;
+                const tempTextArea = document.createElement("textarea");
+                tempTextArea.value = codeText;
+                document.body.appendChild(tempTextArea);
+                tempTextArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(tempTextArea);
+
+                const btn = document.getElementById('btnCopyCode');
+                btn.innerHTML = `<i class="fa-solid fa-check"></i><span>Tersalin!</span>`;
+                btn.className = "absolute top-3 right-3 bg-emerald-700 text-white font-semibold px-3 py-1.5 rounded-lg text-xs transition flex items-center space-x-1 shadow-md";
+                setTimeout(() => {
+                    btn.innerHTML = `<i class="fa-regular fa-copy"></i><span>Salin Kode</span>`;
+                    btn.className = "absolute top-3 right-3 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold px-3 py-1.5 rounded-lg text-xs transition flex items-center space-x-1 shadow-md";
+                }, 2000);
+            };
+        };
+    </script>
+</body>
+</html>
